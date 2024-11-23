@@ -7,10 +7,10 @@ use std::string::String;
 
 #[derive(Parser)]
 #[grammar = "paradox.pest"] // 指向你的 Pest 语法文件
-struct ParadoxParser;
+pub struct ParadoxParser;
 
 #[derive(Debug, Clone)]
-enum DictValue {
+pub enum DictValue {
 	Int(i64),
 	Float(f64),
 	String(String),
@@ -22,7 +22,7 @@ enum DictValue {
 
 
 #[derive(Debug, Clone, Eq, Hash, PartialEq)]
-enum DictKey {
+pub enum DictKey {
 	String(String),
 	Int(i64),
 }
@@ -111,7 +111,7 @@ impl ParadoxParser {
 			}
 		}
 	}
-	pub fn parse_to_json(input: &str) -> Result<HashMap<DictKey, DictValue>, Error<Rule>> {
+	pub fn parse_to_hash_map(input: &str) -> Result<HashMap<DictKey, DictValue>, Error<Rule>> {
 		let input_pairs = Self::parse(Rule::input, input).unwrap().next().unwrap();
 		let mut result = HashMap::<DictKey, DictValue>::new();
 		for pair in input_pairs.into_inner() {
@@ -172,7 +172,7 @@ impl std::fmt::Display for DictValue {
 	}
 }
 
-struct DisplayHashMap<'a>(pub &'a HashMap<DictKey, DictValue>);
+pub struct DisplayHashMap<'a>(pub &'a HashMap<DictKey, DictValue>);
 impl<'a> std::fmt::Display for DisplayHashMap<'a> {
 	fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
 		write!(f, "{{\n")?;
@@ -186,8 +186,6 @@ impl<'a> std::fmt::Display for DisplayHashMap<'a> {
 		write!(f, "}}")
 	}
 }
-fn main() {}
-
 #[cfg(test)]
 mod tests {
 	use crate::{DisplayHashMap, ParadoxParser};
@@ -208,7 +206,7 @@ mod tests {
         path="C:/Users/actur/Documents/Paradox Interactive/Europa Universalis IV/mod/infinite_mission_reward"
         remote_file_id="2636386736"
     "#;
-		let result = ParadoxParser::parse_to_json(input).unwrap();
+		let result = ParadoxParser::parse_to_hash_map(input).unwrap();
 		println!("{}", DisplayHashMap(&result));
 	}
 
@@ -216,7 +214,7 @@ mod tests {
 	fn parse_idea() {
 		let content = fs::read_to_string("data/00_basic_ideas.txt")
 			.unwrap_or_else(|error| panic!("读取文件内容失败：{:?}", error));
-		let result = ParadoxParser::parse_to_json(&content).unwrap();
+		let result = ParadoxParser::parse_to_hash_map(&content).unwrap();
 		println!("{}", DisplayHashMap(&result));
 	}
 }
