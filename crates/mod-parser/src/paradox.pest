@@ -1,15 +1,16 @@
-input       =  { SOI ~ pair+ ~ EOI }
-INTEGER     = @{ ASCII_DIGIT+ ~ !(("." ~ ASCII_DIGIT)) }
+input       =  { SOI ~ (pair | COMMENT)* ~ EOI }
+INTEGER     = @{ ASCII_DIGIT+ ~ !("." ~ ASCII_DIGIT) }
 FLOAT       = @{ ASCII_DIGIT+ ~ "." ~ ASCII_DIGIT+ }
 NUMBER      = ${ INTEGER | FLOAT }
 WHITESPACE  = _{ " " | "\t" | "\r" | "\n" }
 WORD        = @{ (ASCII_ALPHANUMERIC | "_" | "-" | "." | "/" | ":")+ }
-LBRACE      = @{ "{" }
-RBRACE      = @{ "}" }
-json_object = ${ LBRACE ~ WHITESPACE* ~ pair+ ~ WHITESPACE* ~ RBRACE }
-array_list  = ${ LBRACE ~ WHITESPACE* ~ value+ ~ WHITESPACE* ~ RBRACE }
-
+LBRACE      = _{ "{" }
+RBRACE      = _{ "}" }
+ASSIGN      = _{ "=" }
+COMMENT     = _{ (("//" | "#") ~ (!"\n" ~ ANY)* ~ ("\n" | EOI)) }
+json_object = ${ LBRACE ~ (pair | COMMENT | WHITESPACE)* ~ RBRACE }
+array_list  = ${ LBRACE ~ (value | COMMENT | WHITESPACE)* ~ RBRACE }
 quoted_word = @{ "\"" ~ WORD ~ (" " ~ WORD)* ~ "\"" }
 key         = ${ WORD | NUMBER }
 value       = ${ WORD | NUMBER | quoted_word | json_object | array_list }
-pair        = ${ key ~ "=" ~ value }
+pair        = ${ key ~ WHITESPACE* ~ ASSIGN ~ WHITESPACE* ~ value }
