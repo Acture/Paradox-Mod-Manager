@@ -1,0 +1,8 @@
+[package]
+name = "mod-parser"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+pest_derive = "2.7.14"
+pest = "2.7.14"
