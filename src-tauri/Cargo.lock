@@ -821,7 +821,6 @@ dependencies = [
  "log",
  "md5",
  "serde",
- "serde_json",
  "serde_yaml",
  "tauri",
  "tauri-build",
