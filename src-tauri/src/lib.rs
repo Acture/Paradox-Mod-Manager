@@ -3,8 +3,9 @@ mod file;
 use dashmap::DashMap;
 use std::sync::LazyLock;
 use log::{info, debug, error};
-use tauri::Manager;
+use tauri::{Manager, RunEvent};
 use serde_yaml;
+use serde_json;
 
 static GAME_CONFIG: LazyLock<DashMap<String, config::GameConfig>> =
 	LazyLock::new(|| DashMap::new());
@@ -79,34 +80,24 @@ fn setup_game_config(game_name: &str, game_dir: &str, mod_dir: &str) {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-	let app = tauri::Builder::default()
-			.setup(|app| {
-				load_game_config();
-
-				let window = app.get_webview_window("main").unwrap();
-
-				if let Some(window) = app.get_webview_window("main") {
-					// 使用 on_window_event 监听事件
-					window.clone().on_window_event(move |event| {
-						if let tauri::WindowEvent::CloseRequested { api, .. } = event {
-							// 阻止窗口直接关闭
-							api.prevent_close();
-
-							// 保存配置
-							save_game_config();
-
-							// 现在可以手动关闭窗口
-							window.close().unwrap();
-						}
-					});
-				}
-
-				Ok(())
-			})
+	let mut app = tauri::Builder::default()
 			.plugin(tauri_plugin_shell::init())
 			.invoke_handler(tauri::generate_handler![greet, setup_game_config])
-			.run(tauri::generate_context!())
-			.expect("error while running tauri application");
+			.setup(|app| {
+				load_game_config();
+				Ok(())
+			})
+			.build(tauri::generate_context!())
+			.expect("error while building tauri application");
+
+	app.run(move |_app_handle, _event| {
+		match &_event {
+			RunEvent::ExitRequested { .. } => {
+				save_game_config();
+			}
+			_ => {}
+		}
+	});
 }
 
 #[cfg(test)]
