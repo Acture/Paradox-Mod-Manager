@@ -1,3 +1,6 @@
+/* src/styles/main.css */
+@import url("antd/dist/reset.css"); /* 导入 Antd 样式重置 */
+
 .logo.vite:hover {
 	filter: drop-shadow(0 0 2em #747bff);
 }
@@ -11,15 +14,13 @@
 	font-size: 16px;
 	line-height: 24px;
 	font-weight: 400;
-
 	color: #0f0f0f;
 	background-color: #f6f6f6;
-
 	font-synthesis: none;
-	text-rendering: optimizeLegibility;
+	text-rendering: optimizelegibility;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
-	-webkit-text-size-adjust: 100%;
+	text-size-adjust: 100%;
 }
 
 .container {
@@ -70,9 +71,9 @@ button {
 	font-weight: 500;
 	font-family: inherit;
 	color: #0f0f0f;
-	background-color: #ffffff;
+	background-color: #fff;
 	transition: border-color 0.25s;
-	box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+	box-shadow: 0 2px 2px rgb(0 0 0 / 20%);
 }
 
 button {
@@ -93,9 +94,29 @@ button {
 	outline: none;
 }
 
-#greet-input {
-	margin-right: 5px;
+/* 通用滚动条的默认样式，滚动条不太明显 */
+::-webkit-scrollbar {
+	width: 6px; /* 窄一点，让滚动条不占过多空间 */
+	height: 6px;
 }
+
+::-webkit-scrollbar-track {
+	background: transparent; /* 背景设为透明，让滚动条更隐形 */
+}
+
+::-webkit-scrollbar-thumb {
+	background: rgba(255, 255, 255, 0.2); /* 默认滚动条滑块颜色较淡，透明度较高 */
+	border-radius: 3px; /* 圆角柔化滚动条形状 */
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: rgba(255, 255, 255, 0.4); /* 鼠标悬停时变得稍微清晰，提高可见度 */
+}
+
+::-webkit-scrollbar-thumb:active {
+	background: rgba(255, 255, 255, 0.6); /* 鼠标点击时滚动条更为明显 */
+}
+
 
 @media (prefers-color-scheme: dark) {
 	:root {
@@ -109,7 +130,7 @@ button {
 
 	input,
 	button {
-		color: #ffffff;
+		color: #fff;
 		background-color: #0f0f0f98;
 	}
 
