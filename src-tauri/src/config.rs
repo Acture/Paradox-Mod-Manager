@@ -1,10 +1,29 @@
 use std::path::PathBuf;
 
 #[derive(Debug)]
-pub struct GameConfig {
-	game_name: String,
-	game_dir: PathBuf,
-	mod_dir: PathBuf,
+pub(crate) struct Config {
+	pub(crate) config_save_path: PathBuf,
+}
+
+impl Config {
+	pub(crate) fn new(config_save_path: PathBuf) -> Self {
+		Self {
+			config_save_path,
+		}
+	}
+	pub(crate) fn default() -> Self {
+		Self {
+			config_save_path: PathBuf::from("config.json"),
+		}
+	}
+}
+
+
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub(crate) struct GameConfig {
+	pub(crate) game_name: String,
+	pub(crate) game_dir: PathBuf,
+	pub(crate) mod_dir: PathBuf,
 }
 
 impl GameConfig {
@@ -16,11 +35,11 @@ impl GameConfig {
 		}
 	}
 
-	pub fn is_game_dir_exists(&self) -> bool {
+	pub(crate) fn is_game_dir_exists(&self) -> bool {
 		self.game_dir.exists()
 	}
 
-	pub fn is_mod_dir_exists(&self) -> bool {
+	pub(crate) fn is_mod_dir_exists(&self) -> bool {
 		self.mod_dir.exists()
 	}
 }
