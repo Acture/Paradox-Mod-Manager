@@ -2,7 +2,9 @@ mod config;
 mod file;
 use dashmap::DashMap;
 use std::sync::LazyLock;
-use log::{info, debug};
+use log::{info, debug, error};
+use tauri::Manager;
+use serde_yaml;
 
 static GAME_CONFIG: LazyLock<DashMap<String, config::GameConfig>> =
 	LazyLock::new(|| DashMap::new());
@@ -18,8 +20,7 @@ fn greet(name: &str) -> String {
 	format!("Hello, {}! You've been greeted from Rust!", name)
 }
 
-#[tauri::command]
-fn load_game_config(){
+fn load_game_config() {
 	if CONFIG.config_save_path.exists() {
 		info!("Loading config from {:?}", CONFIG.config_save_path);
 
@@ -30,7 +31,7 @@ fn load_game_config(){
 				return;
 			}
 		};
-		let game_configs: Vec<config::GameConfig> = match serde_json::from_slice(&content) {
+		let game_configs: Vec<config::GameConfig> = match serde_yaml::from_slice(&content) {
 			Ok(gc) => gc,
 			Err(e) => {
 				eprintln!("Error parsing config file {:?}: {}", CONFIG.config_save_path, e);
@@ -45,22 +46,26 @@ fn load_game_config(){
 	}
 }
 
-#[tauri::command]
-fn save_game_config(){
+fn save_game_config() {
 	let game_configs: Vec<config::GameConfig> = GAME_CONFIG
 			.iter()
 			.map(|gc| gc.value().clone())
 			.collect();
-	let content = match serde_json::to_vec(&game_configs) {
+	if game_configs.is_empty() {
+		info!("No game configurations to save.");
+		return; // 如果配置为空，直接返回，跳过保存
+	}
+
+	let content = match serde_yaml::to_string(&game_configs) {
 		Ok(c) => c,
 		Err(e) => {
-			eprintln!("Error serializing game configs: {}", e);
+			error!("Error serializing game configs: {}", e);
 			return;
 		}
 	};
 	match std::fs::write(&CONFIG.config_save_path, content) {
 		Ok(_) => info!("Config saved to {:?}", CONFIG.config_save_path),
-		Err(e) => eprintln!("Error saving config to {:?}: {}", CONFIG.config_save_path, e),
+		Err(e) => error!("Error saving config to {:?}: {}", CONFIG.config_save_path, e),
 	}
 }
 
@@ -74,9 +79,32 @@ fn setup_game_config(game_name: &str, game_dir: &str, mod_dir: &str) {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-	tauri::Builder::default()
+	let app = tauri::Builder::default()
+			.setup(|app| {
+				load_game_config();
+
+				let window = app.get_webview_window("main").unwrap();
+
+				if let Some(window) = app.get_webview_window("main") {
+					// 使用 on_window_event 监听事件
+					window.clone().on_window_event(move |event| {
+						if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+							// 阻止窗口直接关闭
+							api.prevent_close();
+
+							// 保存配置
+							save_game_config();
+
+							// 现在可以手动关闭窗口
+							window.close().unwrap();
+						}
+					});
+				}
+
+				Ok(())
+			})
 			.plugin(tauri_plugin_shell::init())
-			.invoke_handler(tauri::generate_handler![greet])
+			.invoke_handler(tauri::generate_handler![greet, setup_game_config])
 			.run(tauri::generate_context!())
 			.expect("error while running tauri application");
 }
@@ -95,10 +123,18 @@ mod tests {
 	}
 
 	#[test]
-	fn test_load_config(){
+	fn test_load_config() {
 		env_logger::builder().filter_level(LevelFilter::Info).init();
 		load_game_config();
 	}
+
+	#[test]
+	fn test_save_config() {
+		env_logger::builder().filter_level(LevelFilter::Info).init();
+		setup_game_config("test", ".", "src");
+		save_game_config();
+	}
+
 
 	#[test]
 	fn test_setup_game_config() {

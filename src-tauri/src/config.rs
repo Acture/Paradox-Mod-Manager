@@ -13,7 +13,7 @@ impl Config {
 	}
 	pub(crate) fn default() -> Self {
 		Self {
-			config_save_path: PathBuf::from("config.json"),
+			config_save_path: PathBuf::from("config.yaml"),
 		}
 	}
 }
