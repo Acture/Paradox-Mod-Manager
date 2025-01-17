@@ -1,6 +1,3 @@
-/* src/styles/main.css */
-@import url("antd/dist/reset.css"); /* 导入 Antd 样式重置 */
-
 .logo.vite:hover {
 	filter: drop-shadow(0 0 2em #747bff);
 }
@@ -14,13 +11,17 @@
 	font-size: 16px;
 	line-height: 24px;
 	font-weight: 400;
+	margin: 0;
+	padding: 0;
+
 	color: #0f0f0f;
 	background-color: #f6f6f6;
+
 	font-synthesis: none;
-	text-rendering: optimizelegibility;
+	text-rendering: optimizeLegibility;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
-	text-size-adjust: 100%;
+	-webkit-text-size-adjust: 100%;
 }
 
 .container {
@@ -71,9 +72,9 @@ button {
 	font-weight: 500;
 	font-family: inherit;
 	color: #0f0f0f;
-	background-color: #fff;
+	background-color: #ffffff;
 	transition: border-color 0.25s;
-	box-shadow: 0 2px 2px rgb(0 0 0 / 20%);
+	box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
 }
 
 button {
@@ -117,6 +118,21 @@ button {
 	background: rgba(255, 255, 255, 0.6); /* 鼠标点击时滚动条更为明显 */
 }
 
+/* Firefox 支持 */
+.my-scrollable-area {
+	scrollbar-width: thin; /* 滚动条较窄 */
+	scrollbar-color: rgba(255, 255, 255, 0.2) transparent; /* 滑块淡色，轨道透明 */
+}
+
+.my-scrollable-area:hover {
+	scrollbar-color: rgba(255, 255, 255, 0.4) transparent; /* 鼠标悬浮时滑块变得稍微清晰 */
+}
+
+html, body {
+	height: 100%; /* 全局设为 100% 高度 */
+	margin: 0;    /* 移除外边距 */
+	overflow: hidden; /* 禁止全局滚动条 */
+}
 
 @media (prefers-color-scheme: dark) {
 	:root {
@@ -130,7 +146,7 @@ button {
 
 	input,
 	button {
-		color: #fff;
+		color: #ffffff;
 		background-color: #0f0f0f98;
 	}
 

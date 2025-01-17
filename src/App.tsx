@@ -30,23 +30,23 @@ const GameOptions = [
 ]
 
 const actions: React.ReactNode[] = [
-	<EditOutlined key="edit" style={{ color: "white" }}/>,
-	<SettingOutlined key="setting" style={{ color: "white" }}/>,
-	<EllipsisOutlined key="ellipsis" style={{ color: "white" }}/>,
+	<EditOutlined key="edit" style={{color: "white"}}/>,
+	<SettingOutlined key="setting" style={{color: "white"}}/>,
+	<EllipsisOutlined key="ellipsis" style={{color: "white"}}/>,
 ];
 
 function App() {
 
 
 	return (
-			<AntdApp style={{width: "100vw", height: "100vh"}}>
+			<AntdApp style={{width: "100vw", height: "100vh", margin: 0}}>
 				<Layout style={{width: "100%", height: "100%"}}>
-					<Layout.Sider >
-						<Flex vertical style={{width: "100%", height: "100%", overflowY: "auto"}}>
+					<Layout.Sider style={{width: "100%", height: "100%", overflowY: "auto", direction: "rtl"}}>
+						<Flex vertical style={{width: "100%", height: "auto", direction:"ltr"}}>
 							{
 								GameOptions.map(({value, label, img_url}) => (
 										<Card
-												style={{width: "100%" , height:"100%"}}
+												style={{width: "100%", height: "auto"}}
 												type="inner"
 												size={"small"}
 												hoverable={true}
@@ -54,7 +54,7 @@ function App() {
 												cover={<img
 														alt={label}
 														src={img_url ? img_url : default_img_link}
-														style={{ height: "20%", objectFit: "cover" }}
+														style={{height: "20%", objectFit: "cover"}}
 
 												/>}
 
@@ -70,7 +70,6 @@ function App() {
 					</Layout.Sider>
 
 				</Layout>
-
 
 			</AntdApp>
 	);
