@@ -19,7 +19,7 @@ impl Config {
 }
 
 
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
 pub(crate) struct GameConfig {
 	pub(crate) game_name: String,
 	pub(crate) game_dir: PathBuf,

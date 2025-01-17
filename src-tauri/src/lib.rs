@@ -4,32 +4,36 @@ use dashmap::DashMap;
 use std::sync::LazyLock;
 use log::{info, debug};
 
+static GAME_CONFIG: LazyLock<DashMap<String, config::GameConfig>> =
+	LazyLock::new(|| DashMap::new());
+
+static CONFIG: LazyLock<config::Config> = LazyLock::new(|| {
+	config::Config::default()
+});
+
+
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
 fn greet(name: &str) -> String {
 	format!("Hello, {}! You've been greeted from Rust!", name)
 }
 
-static GAME_CONFIG: LazyLock<DashMap<String, config::GameConfig>> =
-	LazyLock::new(|| DashMap::new());
+#[tauri::command]
+fn load_game_config(){
+	if CONFIG.config_save_path.exists() {
+		info!("Loading config from {:?}", CONFIG.config_save_path);
 
-fn load_config(){
-	let config = config::Config::default();
-
-	if config.config_save_path.exists() {
-		info!("Loading config from {:?}", config.config_save_path);
-
-		let content = match std::fs::read(&config.config_save_path) {
+		let content = match std::fs::read(&CONFIG.config_save_path) {
 			Ok(c) => c,
 			Err(e) => {
-				eprintln!("Error reading file {:?}: {}", config.config_save_path, e);
+				eprintln!("Error reading file {:?}: {}", CONFIG.config_save_path, e);
 				return;
 			}
 		};
 		let game_configs: Vec<config::GameConfig> = match serde_json::from_slice(&content) {
 			Ok(gc) => gc,
 			Err(e) => {
-				eprintln!("Error parsing config file {:?}: {}", config.config_save_path, e);
+				eprintln!("Error parsing config file {:?}: {}", CONFIG.config_save_path, e);
 				return;
 			}
 		};
@@ -37,7 +41,26 @@ fn load_config(){
 			GAME_CONFIG.insert(game_config.game_name.clone(), game_config);
 		}
 	} else {
-		info!("Config file {:?} not found, using default config", config.config_save_path);
+		info!("Config file {:?} not found, using default config", CONFIG.config_save_path);
+	}
+}
+
+#[tauri::command]
+fn save_game_config(){
+	let game_configs: Vec<config::GameConfig> = GAME_CONFIG
+			.iter()
+			.map(|gc| gc.value().clone())
+			.collect();
+	let content = match serde_json::to_vec(&game_configs) {
+		Ok(c) => c,
+		Err(e) => {
+			eprintln!("Error serializing game configs: {}", e);
+			return;
+		}
+	};
+	match std::fs::write(&CONFIG.config_save_path, content) {
+		Ok(_) => info!("Config saved to {:?}", CONFIG.config_save_path),
+		Err(e) => eprintln!("Error saving config to {:?}: {}", CONFIG.config_save_path, e),
 	}
 }
 
@@ -74,7 +97,7 @@ mod tests {
 	#[test]
 	fn test_load_config(){
 		env_logger::builder().filter_level(LevelFilter::Info).init();
-		load_config();
+		load_game_config();
 	}
 
 	#[test]
