@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {Card, Button, Flex, Row, Col, message} from "antd";
 import {open} from '@tauri-apps/plugin-dialog';
-import { warn, debug, trace, info, error } from '@tauri-apps/plugin-log';
+import { warn, info } from '@tauri-apps/plugin-log';
 import {invoke} from "@tauri-apps/api/core";
 
 interface GameConfigProps {

@@ -66,7 +66,7 @@ const GameList: Game[] = [
 
 
 const GenerateTabs = (GameList: Game[], default_img: string) => {
-	const GameTabs = GameList.map(({game_name, bg_img, game_dir, mod_dir, logo_img}) => {
+	const gameTabs = GameList.map(({game_name, bg_img, game_dir, mod_dir, logo_img}) => {
 		return {
 			key: game_name,
 			label: (
@@ -78,8 +78,8 @@ const GenerateTabs = (GameList: Game[], default_img: string) => {
 					             game_logo={logo_img}/>
 			)
 		};
-	})
-	const AddGameTab = {
+	});
+	const addGameTab = {
 		key: "Add Game",
 		label: (
 				<Button
@@ -93,9 +93,9 @@ const GenerateTabs = (GameList: Game[], default_img: string) => {
 				/>
 		),
 		children: ""
-	}
-	return [...GameTabs, AddGameTab];
-}
+	};
+	return [...gameTabs, addGameTab];
+};
 
 
 function App() {
