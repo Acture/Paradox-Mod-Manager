@@ -1,6 +1,19 @@
-import React, {useState} from "react";
-import {Card, Button, Flex, Row, Col} from "antd";
+import React, {useEffect, useState} from "react";
+import {Card, Button, Flex, Row, Col, message} from "antd";
 import {open} from '@tauri-apps/plugin-dialog';
+import { warn, debug, trace, info, error } from '@tauri-apps/plugin-log';
+import {invoke} from "@tauri-apps/api/core";
+
+
+
+async function setup_game_config(game_name: string, game_dir: string, mod_dir: string) {
+	await invoke("setup_game_config", {game_name, game_dir, mod_dir});
+}
+
+async function read_game_config(game_name: string) {
+	const _config = await invoke("read_game_config", {game_name});
+	info(`Read ${game_name} Config: ${_config}`);
+}
 
 interface GameConfigProps {
 	game_name: string;
@@ -12,6 +25,15 @@ interface GameConfigProps {
 const GameConfig: React.FC<GameConfigProps> = ({game_name, game_dir, mod_dir}) => {
 	const [_game_dir, setGameDir] = useState<string | null>(game_dir);
 	const [_mod_dir, setModDir] = useState<string | null>(mod_dir);
+	const [messageApi, contentHolder] = message.useMessage();
+
+	useEffect(() => {
+		read_game_config(game_name).then((config: any) => {
+			messageApi.success(`Got ${game_name} Config ${config}`);
+		}).catch((error: any) => {
+			messageApi.error(`Failed to get ${game_name} Config: ${error}`);
+		});
+	}, []);
 
 	// 设置 `game_dir` 的函数
 	const handleSetGameDir = async () => {
@@ -40,6 +62,19 @@ const GameConfig: React.FC<GameConfigProps> = ({game_name, game_dir, mod_dir}) =
 	};
 
 	const handleSave = async () => {
+		if (!_game_dir){
+			messageApi.error(`Please set ${game_name} game directory`);
+			return;
+		}
+		if (!_mod_dir){
+			messageApi.error(`Please set ${game_name} mod directory`);
+			return;
+		}
+		await setup_game_config(game_name, _game_dir, _mod_dir).then(
+				()=>{messageApi.success(`${game_name} Config Saved`)}
+		).catch(
+				(error)=>{messageApi.error(`Failed to save ${game_name} Config: ${error}`)}
+		)
 	};
 
 
@@ -54,7 +89,7 @@ const GameConfig: React.FC<GameConfigProps> = ({game_name, game_dir, mod_dir}) =
 
 
 			>
-
+				{contentHolder}
 				<Row justify={"space-around"} align={"middle"}>
 					<Col flex={2}>
 						<h4>Game Directory</h4>

@@ -12,9 +12,11 @@
 	"app": {
 		"windows": [
 			{
-				"title": "eu4-mod-manager",
-				"width": 800,
-				"height": 600
+				"title": "Paradox Mod Manager",
+				"width": 1600,
+				"height": 900,
+				"resizable": false,
+				"decorations": true
 			}
 		],
 		"security": {

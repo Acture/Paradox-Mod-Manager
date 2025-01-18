@@ -1,4 +1,3 @@
-import {invoke} from "@tauri-apps/api/core";
 import {App as AntdApp, Button, Layout, Tabs} from "antd"; // 引入 Antd App 和组件
 import { FolderAddOutlined} from '@ant-design/icons';
 import pdx_logo from "./assets/pdx_logo.png";
@@ -14,9 +13,7 @@ import "./App.css";
 import GameTab from "./components/GameTab.tsx";
 import GameContent from "./components/GameContent.tsx";
 
-async function setup_game_config(game_name: string, game_dir: string, mod_dir: string) {
-	await invoke("setup_game_config", {game_name, game_dir, mod_dir});
-}
+
 
 interface Game {
 	game_name: string;
