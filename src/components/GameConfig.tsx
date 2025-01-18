@@ -14,13 +14,44 @@ async function setup_game_config(game_name: string, game_dir: string, mod_dir: s
 	await invoke("setup_game_config", {game_name, game_dir, mod_dir});
 }
 
-async function read_game_config(game_name: string) : Promise<GameConfigProps> {
-	const result = await invoke("read_game_config", {game_name});
-	const config = result as GameConfigProps;
-	if (config && typeof config === 'object') {
-		return config;
+async function read_game_config(game_name: string, options?: { signal?: AbortSignal }
+) : Promise<GameConfigProps> {
+	const { signal } = options || {};
+
+	// 提前检查是否已经中止
+	if (signal?.aborted) {
+		return Promise.reject(new Error(`Aborted`));
 	}
-	throw new Error(`Failed to read ${game_name} config`);
+	return new Promise((resolve, reject) => {
+		// 当中止信号触发时，调用 reject 并中止任务
+		const onAbort = () => {
+			reject(new Error(`Aborted`));
+		};
+
+		// 如果传入了 signal，将其与 abort 事件绑定
+		signal?.addEventListener("abort", onAbort);
+
+		// 调用 Tauri 的 invoke
+		invoke("read_game_config", { game_name })
+				.then((result: any) => {
+					const config = result as GameConfigProps;
+
+					// 判断返回结果是否正常
+					if (config && typeof config === "object") {
+						resolve(config);
+					} else {
+						reject(new Error(`Invalid config format for ${game_name}`));
+					}
+				})
+				.catch((error: any) => {
+					reject(new Error(`Failed to read ${game_name} config: ${error.message}`));
+				})
+				.finally(() => {
+					// 清理事件监听器，避免内存泄漏
+					signal?.removeEventListener("abort", onAbort);
+				});
+	});
+
 }
 
 
@@ -32,15 +63,23 @@ const GameConfig: React.FC<GameConfigProps> = ({game_name, game_dir, mod_dir}) =
 	const [messageApi, contentHolder] = message.useMessage();
 
 	useEffect(() => {
-		read_game_config(game_name).then((config: GameConfigProps) => {
-			setGameDir(config.game_dir);
-			setModDir(config.mod_dir);
-			messageApi.success(`${game_name} Config Loaded`);
-		}).catch((error: any) => {
-			messageApi.error(`Failed to get ${game_name} Config`);
-			error(`Failed to get ${game_name} Config: ${error}`);
-		});
-	}, []);
+		const controller = new AbortController();
+		const signal = controller.signal;
+
+		read_game_config(game_name, { signal })
+				.then((config) => {
+					setGameDir(config.game_dir);
+					setModDir(config.mod_dir);
+				})
+				.catch((error) => {
+					warn(`Failed to read ${game_name} config: ${error.message}`);
+				});
+
+		return () => {
+			controller.abort();
+		};
+
+	}, [game_name]);
 
 	// 设置 `game_dir` 的函数
 	const handleSetGameDir = async () => {
