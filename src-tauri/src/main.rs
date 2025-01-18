@@ -2,5 +2,5 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
-    eu4_mod_manager_lib::run()
+	eu4_mod_manager_lib::run()
 }

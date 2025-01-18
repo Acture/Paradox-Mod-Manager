@@ -4,22 +4,26 @@ import {open} from '@tauri-apps/plugin-dialog';
 import { warn, debug, trace, info, error } from '@tauri-apps/plugin-log';
 import {invoke} from "@tauri-apps/api/core";
 
-
-
-async function setup_game_config(game_name: string, game_dir: string, mod_dir: string) {
-	await invoke("setup_game_config", {game_name, game_dir, mod_dir});
-}
-
-async function read_game_config(game_name: string) {
-	const _config = await invoke("read_game_config", {game_name});
-	info(`Read ${game_name} Config: ${_config}`);
-}
-
 interface GameConfigProps {
 	game_name: string;
 	game_dir: string | null;
 	mod_dir: string | null;
 }
+
+async function setup_game_config(game_name: string, game_dir: string, mod_dir: string) {
+	await invoke("setup_game_config", {game_name, game_dir, mod_dir});
+}
+
+async function read_game_config(game_name: string) : Promise<GameConfigProps> {
+	const result = await invoke("read_game_config", {game_name});
+	const config = result as GameConfigProps;
+	if (config && typeof config === 'object') {
+		return config;
+	}
+	throw new Error(`Failed to read ${game_name} config`);
+}
+
+
 
 
 const GameConfig: React.FC<GameConfigProps> = ({game_name, game_dir, mod_dir}) => {
@@ -28,10 +32,13 @@ const GameConfig: React.FC<GameConfigProps> = ({game_name, game_dir, mod_dir}) =
 	const [messageApi, contentHolder] = message.useMessage();
 
 	useEffect(() => {
-		read_game_config(game_name).then((config: any) => {
-			messageApi.success(`Got ${game_name} Config ${config}`);
+		read_game_config(game_name).then((config: GameConfigProps) => {
+			setGameDir(config.game_dir);
+			setModDir(config.mod_dir);
+			messageApi.success(`${game_name} Config Loaded`);
 		}).catch((error: any) => {
-			messageApi.error(`Failed to get ${game_name} Config: ${error}`);
+			messageApi.error(`Failed to get ${game_name} Config`);
+			error(`Failed to get ${game_name} Config: ${error}`);
 		});
 	}, []);
 
@@ -55,7 +62,7 @@ const GameConfig: React.FC<GameConfigProps> = ({game_name, game_dir, mod_dir}) =
 			directory: true,
 			title: `Set Mod directory for ${game_name}`,
 		});
-		console.log(selected_dir);
+		info(`selected_dir: ${selected_dir}`);
 		if (selected_dir) {
 			setModDir(selected_dir as string); // 更新组件内的状态
 		}
@@ -73,7 +80,10 @@ const GameConfig: React.FC<GameConfigProps> = ({game_name, game_dir, mod_dir}) =
 		await setup_game_config(game_name, _game_dir, _mod_dir).then(
 				()=>{messageApi.success(`${game_name} Config Saved`)}
 		).catch(
-				(error)=>{messageApi.error(`Failed to save ${game_name} Config: ${error}`)}
+				(error)=>{
+					messageApi.error(`Failed to save ${game_name} Config`)
+					error(`Failed to save ${game_name} Config: ${error}`)
+				}
 		)
 	};
 
