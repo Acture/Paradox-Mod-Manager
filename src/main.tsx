@@ -3,7 +3,6 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import {DevSupport} from "@react-buddy/ide-toolbox";
 import {ConfigProvider, theme} from "antd"; // 引入 ConfigProvider 和 Ant Design 主题
-
 import {ComponentPreviews, useInitial} from "./dev";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(

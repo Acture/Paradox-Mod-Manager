@@ -130,7 +130,7 @@ button {
 
 html, body {
 	height: 100%; /* 全局设为 100% 高度 */
-	margin: 0;    /* 移除外边距 */
+	margin: 0; /* 移除外边距 */
 	overflow: hidden; /* 禁止全局滚动条 */
 }
 

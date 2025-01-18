@@ -1,5 +1,5 @@
 import React from "react";
-import { Layout, Row, Col} from "antd";
+import {Col, Layout, Row} from "antd";
 import GameConfig from "./GameConfig.tsx";
 
 interface GameContentProps {
@@ -16,10 +16,10 @@ const GameContent: React.FC<GameContentProps> = ({game_name, game_dir, mod_dir, 
 	return (
 			<Layout>
 				<Layout.Header style={{backgroundColor: "transparent"}}/>
-				<Layout.Content style={{width:"100%"}}>
-					<Row justify={"space-around"} align={"middle"} style={{width:"100%"}}>
+				<Layout.Content style={{width: "100%"}}>
+					<Row justify={"space-around"} align={"middle"} style={{width: "100%"}}>
 						<Col span={11}>
-							<div style={{maxWidth:"100%"}}>
+							<div style={{maxWidth: "100%"}}>
 								<img
 										alt={game_name}
 										src={game_logo ? game_logo : ""}

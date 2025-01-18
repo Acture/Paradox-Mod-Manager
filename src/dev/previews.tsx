@@ -12,6 +12,9 @@ const ComponentPreviews = () => {
 				<ComponentPreview path="/GameConfig">
 					<GameConfig game_name={""} game_dir={null} mod_dir={null}/>
 				</ComponentPreview>
+				<ComponentPreview path="/ComponentPreviews">
+					<ComponentPreviews/>
+				</ComponentPreview>
 			</Previews>
 	);
 };

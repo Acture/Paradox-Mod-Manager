@@ -1,8 +1,10 @@
 import React, {useEffect, useState} from "react";
-import {Card, Button, Flex, Row, Col, message} from "antd";
-import {open} from '@tauri-apps/plugin-dialog';
-import { warn, info } from '@tauri-apps/plugin-log';
+import {Button, Card, Col, Flex, message, Row} from "antd";
+import {open as dialog_open} from '@tauri-apps/plugin-dialog';
+import {open as shell_open} from '@tauri-apps/plugin-shell';
+import {info, warn} from '@tauri-apps/plugin-log';
 import {invoke} from "@tauri-apps/api/core";
+import Text from "antd/es/typography/Text";
 
 interface GameConfigProps {
 	game_name: string;
@@ -14,9 +16,8 @@ async function setup_game_config(game_name: string, game_dir: string, mod_dir: s
 	await invoke("setup_game_config", {game_name, game_dir, mod_dir});
 }
 
-async function read_game_config(game_name: string, options?: { signal?: AbortSignal }
-) : Promise<GameConfigProps> {
-	const { signal } = options || {};
+async function read_game_config(game_name: string, options?: { signal?: AbortSignal }): Promise<GameConfigProps> {
+	const {signal} = options || {};
 
 	// 提前检查是否已经中止
 	if (signal?.aborted) {
@@ -32,7 +33,7 @@ async function read_game_config(game_name: string, options?: { signal?: AbortSig
 		signal?.addEventListener("abort", onAbort);
 
 		// 调用 Tauri 的 invoke
-		invoke("read_game_config", { game_name })
+		invoke("read_game_config", {game_name})
 				.then((result: any) => {
 					const config = result as GameConfigProps;
 
@@ -55,8 +56,6 @@ async function read_game_config(game_name: string, options?: { signal?: AbortSig
 }
 
 
-
-
 const GameConfig: React.FC<GameConfigProps> = ({game_name, game_dir, mod_dir}) => {
 	const [_game_dir, setGameDir] = useState<string | null>(game_dir);
 	const [_mod_dir, setModDir] = useState<string | null>(mod_dir);
@@ -66,7 +65,7 @@ const GameConfig: React.FC<GameConfigProps> = ({game_name, game_dir, mod_dir}) =
 		const controller = new AbortController();
 		const signal = controller.signal;
 
-		read_game_config(game_name, { signal })
+		read_game_config(game_name, {signal})
 				.then((config) => {
 					setGameDir(config.game_dir);
 					setModDir(config.mod_dir);
@@ -83,10 +82,8 @@ const GameConfig: React.FC<GameConfigProps> = ({game_name, game_dir, mod_dir}) =
 
 	// 设置 `game_dir` 的函数
 	const handleSetGameDir = async () => {
-		const selected_dir = await open({
-			multiple: false,
-			directory: true,
-			title: `Set directory for ${game_name}`,
+		const selected_dir = await dialog_open({
+			multiple: false, directory: true, title: `Set directory for ${game_name}`,
 		});
 
 		if (selected_dir) {
@@ -96,10 +93,8 @@ const GameConfig: React.FC<GameConfigProps> = ({game_name, game_dir, mod_dir}) =
 
 	// 设置 `mod_dir` 的函数
 	const handleSetModDir = async () => {
-		const selected_dir = await open({
-			multiple: false,
-			directory: true,
-			title: `Set Mod directory for ${game_name}`,
+		const selected_dir = await dialog_open({
+			multiple: false, directory: true, title: `Set Mod directory for ${game_name}`,
 		});
 		info(`selected_dir: ${selected_dir}`);
 		if (selected_dir) {
@@ -108,30 +103,38 @@ const GameConfig: React.FC<GameConfigProps> = ({game_name, game_dir, mod_dir}) =
 	};
 
 	const handleSave = async () => {
-		if (!_game_dir){
+		if (!_game_dir) {
 			messageApi.error(`Please set ${game_name} game directory`);
 			return;
 		}
-		if (!_mod_dir){
+		if (!_mod_dir) {
 			messageApi.error(`Please set ${game_name} mod directory`);
 			return;
 		}
-		await setup_game_config(game_name, _game_dir, _mod_dir).then(
-				()=>{messageApi.success(`${game_name} Config Saved`)}
-		).catch(
-				(error)=>{
-					messageApi.error(`Failed to save ${game_name} Config`)
-					error(`Failed to save ${game_name} Config: ${error}`)
-				}
-		)
+		await setup_game_config(game_name, _game_dir, _mod_dir).then(() => {
+			messageApi.success(`${game_name} Config Saved`)
+		}).catch((error) => {
+			messageApi.error(`Failed to save ${game_name} Config`);
+			error(`Failed to save ${game_name} Config: ${error}`)
+		})
+	};
+
+	const handleOpenDirectory = async (directoryPath: string | null) => {
+		if (!directoryPath) {
+			return;
+		}
+		try {
+			await shell_open(directoryPath); // 打开目录
+		} catch (error) {
+			console.error("无法打开目录:", error);
+		}
 	};
 
 
-	return (
-			<Card
+	return (<Card
 					type="inner"
 					title={(<Flex justify={"space-between"} align={"center"}>
-						<span>Directory Config</span>
+						<Text>Directory Config</Text>
 						<Button color={"blue"} variant={"solid"} style={{boxShadow: "none"}}
 						        onClick={handleSave}>Save</Button>
 					</Flex>)}
@@ -155,23 +158,24 @@ const GameConfig: React.FC<GameConfigProps> = ({game_name, game_dir, mod_dir}) =
 				</Row>
 				<Row justify={"space-around"} align={"middle"}>
 					<Col span={12}>
-						<span
-								style={{
-									color: _game_dir ? "inherit" : "gray",
-									fontWeight: _game_dir ? "inherit" : "bold"
-								}}
+						<Text italic underline onClick={() => handleOpenDirectory(_game_dir)}
+						      style={{
+							      color: _game_dir ? "inherit" : "gray", fontWeight: _game_dir ? "inherit" : "bold"
+						      }}
 						>
 							{_game_dir ? _game_dir : "NOT SET"}
-						</span>
+						</Text>
+
+
 					</Col>
 					<Col span={12}>
-						<span
-								style={{
-									color: _mod_dir ? "inherit" : "gray",
-									fontWeight:  _mod_dir? "inherit" : "bold"
-								}}>
+						<Text italic underline onClick={() => handleOpenDirectory(_mod_dir)}
+						      style={{
+							      color: _mod_dir ? "inherit" : "gray", fontWeight: _mod_dir ? "inherit" : "bold"
+						      }}
+						>
 							{_mod_dir ? _mod_dir : "NOT SET"}
-						</span>
+						</Text>
 					</Col>
 				</Row>
 
