@@ -1,5 +1,5 @@
 import {App as AntdApp, Button, Layout, Tabs} from "antd"; // 引入 Antd App 和组件
-import { FolderAddOutlined} from '@ant-design/icons';
+import {FolderAddOutlined} from '@ant-design/icons';
 import pdx_logo from "./assets/pdx_logo.png";
 import eu4_main_background from "./assets/eu4_main_bg.jpg";
 import eu4_logo from "./assets/eu4_logo.png";
@@ -7,12 +7,13 @@ import ck3_main_background from "./assets/ck3_main_bg.jpg";
 import ck3_logo from "./assets/ck3_logo.png";
 import hoi4_main_background from "./assets/hoi4_main_bg.jpg";
 import hoi4_logo from "./assets/hoi4_logo.png";
+import stellaris_main_background from "./assets/stellaris_main_bg.jpg";
+import stellaris_logo from "./assets/stellaris_logo.png";
 import vic3_main_background from "./assets/vic3_main_bg.jpg";
 import vic3_logo from "./assets/vic3_logo.png";
 import "./App.css";
 import GameTab from "./components/GameTab.tsx";
 import GameContent from "./components/GameContent.tsx";
-
 
 
 interface Game {
@@ -49,6 +50,11 @@ const GameList: Game[] = [
 		game_name: "Hearts of Iron IV",
 		bg_img: hoi4_main_background,
 		logo_img: hoi4_logo,
+	}),
+	createNewGame({
+		game_name: "Stellaris",
+		bg_img: stellaris_main_background,
+		logo_img: stellaris_logo,
 	}),
 	createNewGame({
 		game_name: "Victoria II",
