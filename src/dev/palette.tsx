@@ -5,6 +5,7 @@ import {
 	Variant,
 	Palette,
 } from "@react-buddy/ide-toolbox";
+import AntdPalette from "@react-buddy/palette-antd";
 
 export const PaletteTree = () => (
 		<Palette>
@@ -15,6 +16,7 @@ export const PaletteTree = () => (
 					</Variant>
 				</Component>
 			</Category>
+			<AntdPalette/>
 		</Palette>
 );
 

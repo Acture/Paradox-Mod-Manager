@@ -82,6 +82,7 @@ fn setup_game_config(game_name: &str, game_dir: &str, mod_dir: &str) {
 pub fn run() {
 	let mut app = tauri::Builder::default()
 			.plugin(tauri_plugin_shell::init())
+			.plugin(tauri_plugin_dialog::init())
 			.invoke_handler(tauri::generate_handler![greet, setup_game_config])
 			.setup(|app| {
 				load_game_config();
