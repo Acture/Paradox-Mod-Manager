@@ -14,35 +14,35 @@ const GameContent: React.FC<GameContentProps> = ({game_name, game_dir, mod_dir, 
 
 
 	return (
-			<Layout>
-				<Layout.Header style={{backgroundColor: "transparent"}}/>
-				<Layout.Content style={{width: "100%"}}>
-					<Row justify={"space-around"} align={"middle"} style={{width: "100%"}}>
-						<Col span={11}>
-							<div style={{maxWidth: "100%"}}>
-								<img
-										alt={game_name}
-										src={game_logo ? game_logo : ""}
-										style={{
-											width: "100%",     // 确保图片宽度不超过 div 宽度
-											height: "auto",
-											objectFit: "cover",
-										}}
-								/>
-							</div>
-						</Col>
-						<Col span={11}>
-							<GameConfig game_name={game_name} game_dir={game_dir} mod_dir={mod_dir}/>
+		<Layout>
+			<Layout.Header style={{backgroundColor: "transparent"}}/>
+			<Layout.Content style={{width: "100%"}}>
+				<Row justify={"space-around"} align={"middle"} style={{width: "100%"}}>
+					<Col span={11}>
+						<div style={{maxWidth: "100%"}}>
+							<img
+								alt={game_name}
+								src={game_logo ? game_logo : ""}
+								style={{
+									width: "100%",     // 确保图片宽度不超过 div 宽度
+									height: "auto",
+									objectFit: "cover",
+								}}
+							/>
+						</div>
+					</Col>
+					<Col span={11}>
+						<GameConfig game_name={game_name} game_dir={game_dir} mod_dir={mod_dir}/>
 
-						</Col>
-					</Row>
+					</Col>
+				</Row>
 
 
-				</Layout.Content>
-				<Layout.Footer>
-					<div></div>
-				</Layout.Footer>
-			</Layout>
+			</Layout.Content>
+			<Layout.Footer>
+				<div></div>
+			</Layout.Footer>
+		</Layout>
 	);
 };
 

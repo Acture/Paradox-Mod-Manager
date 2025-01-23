@@ -70,27 +70,27 @@ const GenerateTabs = (GameList: Game[], default_img: string) => {
 		return {
 			key: game_name,
 			label: (
-					<GameTab game_name={game_name} img_src={bg_img ?? default_img}/>
+				<GameTab game_name={game_name} img_src={bg_img ?? default_img}/>
 			),
 			children: (
 
-					<GameContent game_name={game_name} game_dir={game_dir} mod_dir={mod_dir}
-					             game_logo={logo_img}/>
+				<GameContent	game_name={game_name} game_dir={game_dir} mod_dir={mod_dir}
+								game_logo={logo_img}/>
 			)
 		};
 	});
 	const addGameTab = {
 		key: "Add Game",
 		label: (
-				<Button
-						size="large"
-						style={{
-							width: "200px",
-							height: "100px",
-						}}
-						icon={<FolderAddOutlined/>}
+			<Button
+				size="large"
+				style={{
+					width: "200px",
+					height: "100px",
+				}}
+				icon={<FolderAddOutlined/>}
 
-				/>
+			/>
 		),
 		children: ""
 	};
@@ -102,23 +102,23 @@ function App() {
 
 
 	return (
-			<AntdApp style={{width: "100vw", height: "100vh", margin: 0}}>
-				<Layout style={{width: "100%", height: "100%"}}>
+		<AntdApp style={{width: "100vw", height: "100vh", margin: 0}}>
+			<Layout style={{width: "100%", height: "100%"}}>
 
-					<Layout.Content>
-						<Tabs
-								style={{
-									height: "100%",
-									width: "100%",
-								}}
-								tabPosition={"left"}
-								items={GenerateTabs(GameList, pdx_logo)}
-						/>
-					</Layout.Content>
+				<Layout.Content>
+					<Tabs
+						style={{
+							height: "100%",
+							width: "100%",
+						}}
+						tabPosition={"left"}
+						items={GenerateTabs(GameList, pdx_logo)}
+					/>
+				</Layout.Content>
 
-				</Layout>
+			</Layout>
 
-			</AntdApp>
+		</AntdApp>
 	);
 }
 
