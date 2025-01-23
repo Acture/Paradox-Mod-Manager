@@ -57,3 +57,12 @@ jobs:
                 uses: tauri-apps/tauri-action@v0
                 env:
                     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                with:
+                    includeDebug: 'true'
+                    includeRelease: 'true'
+                    tagName: app-v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version.
+                    releaseName: 'App v__VERSION__'
+                    releaseBody: 'A CI build of the app'
+                    releaseDraft: false
+                    prerelease: false
+                    args: ${{ matrix.args }}
