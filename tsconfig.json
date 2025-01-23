@@ -25,6 +25,9 @@
 	"include": [
 		"src"
 	],
+	"exclude": [
+		"src/dev/**",
+	],
 	"references": [
 		{
 			"path": "./tsconfig.node.json"
