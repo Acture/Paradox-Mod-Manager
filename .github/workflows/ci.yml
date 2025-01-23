@@ -2,9 +2,14 @@ name: CI
 
 on:
     push:
-        branches: [ master ]
+        branches:
+            - master
+            - develop
     pull_request:
-        branches: [ master ]
+        branches:
+            - master
+    schedule:
+        -   cron: '0 0 * * 1' # every Monday at 00:00 UTC
     workflow_dispatch:
         inputs:
             debug_enabled:
@@ -12,6 +17,10 @@ on:
                 description: 'Run with debug logging'
                 required: false
                 default: false
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
 
 jobs:
     test-tauri:
