@@ -1,5 +1,4 @@
 name: Release
-
 on:
     push:
         branches:
@@ -20,7 +19,9 @@ on:
                 default: false
 
 jobs:
-    test-tauri:
+    release-tauri:
+        permissions:
+            contents: read | write
         strategy:
             fail-fast: false
             matrix:
