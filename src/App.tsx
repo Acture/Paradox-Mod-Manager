@@ -26,11 +26,11 @@ interface Game {
 
 const createNewGame = (overrides?: Partial<Game>): Game => {
 	return {
-		game_name: overrides?.game_name || "Untitled Game",
-		game_dir: overrides?.game_dir || null,
-		mod_dir: overrides?.mod_dir || null,
-		bg_img: overrides?.bg_img || null,
-		logo_img: overrides?.logo_img || null
+		game_name: overrides?.game_name ?? "Untitled Game",
+		game_dir: overrides?.game_dir ?? null,
+		mod_dir: overrides?.mod_dir ?? null,
+		bg_img: overrides?.bg_img ?? null,
+		logo_img: overrides?.logo_img ?? null
 	};
 };
 
@@ -70,7 +70,7 @@ const GenerateTabs = (GameList: Game[], default_img: string) => {
 		return {
 			key: game_name,
 			label: (
-					<GameTab game_name={game_name} img_src={bg_img || default_img}/>
+					<GameTab game_name={game_name} img_src={bg_img ?? default_img}/>
 			),
 			children: (
 
