@@ -19,6 +19,6 @@ updates: # Enable version updates for npm
 
     -   package-ecosystem: "cargo"
         # Look for `Cargo.toml` and `lock` files in the `root` directory
-        directory: "/"
+        directory: "/src-tauri"
         schedule:
             interval: "weekly"
