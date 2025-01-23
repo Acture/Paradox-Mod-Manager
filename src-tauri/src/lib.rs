@@ -74,13 +74,17 @@ fn save_game_config() {
 }
 
 #[tauri::command(rename_all = "snake_case")]
-async fn setup_game_config(game_name: String, game_dir: String, mod_dir: String) -> Result<(), String> {
+async fn setup_game_config(
+	game_name: String,
+	game_dir: String,
+	mod_dir: String,
+) -> Result<(), String> {
 	tokio::task::spawn_blocking(move || {
 		log::info!(
-		"setup_game_config: game_name: {}, game_dir: {}, mod_dir: {}",
-		game_name,
-		game_dir,
-		mod_dir
+			"setup_game_config: game_name: {}, game_dir: {}, mod_dir: {}",
+			game_name,
+			game_dir,
+			mod_dir
 		);
 		let game_dir = std::path::PathBuf::from(game_dir);
 		let mod_dir = std::path::PathBuf::from(mod_dir);
@@ -110,17 +114,15 @@ async fn read_game_config(game_name: &str) -> Result<serde_json::Value, String> 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
 	let mut app = tauri::Builder::default()
+		.plugin(tauri_plugin_updater::Builder::new().build())
 		.plugin(tauri_plugin_log::Builder::new().build())
 		.plugin(tauri_plugin_shell::init())
 		.plugin(tauri_plugin_dialog::init())
-		.plugin(
-			tauri_plugin_log::Builder::new().build(),
-		)
-		.invoke_handler(
-			tauri::generate_handler![
-				setup_game_config,
-				read_game_config
-			])
+		.plugin(tauri_plugin_log::Builder::new().build())
+		.invoke_handler(tauri::generate_handler![
+			setup_game_config,
+			read_game_config
+		])
 		.setup(|app| {
 			load_game_config();
 			Ok(())
