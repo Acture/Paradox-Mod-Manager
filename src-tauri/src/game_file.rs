@@ -1,7 +1,7 @@
 use md5;
 use std::path::PathBuf;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FileStruct {
 	name: String,
 	base_dir: PathBuf,

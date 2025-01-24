@@ -10,7 +10,7 @@ use nom::IResult;
 use std::collections::HashMap;
 
 #[derive(Debug, PartialEq)]
-enum ParsedValue {
+pub(crate) enum ParsedValue {
 	String(String),                     // 单独的字符串值
 	JSON(HashMap<String, ParsedValue>), // 嵌套的 JSON 键值对
 	List(Vec<ParsedValue>),             // 列表
@@ -79,6 +79,16 @@ fn top_level(input: &str) -> IResult<&str, HashMap<String, ParsedValue>> {
 	)(input)
 }
 
+pub fn parse_content(input: &str) -> HashMap<String, ParsedValue> {
+	let result = top_level(input);
+	match result {
+		Ok((rest, value)) => {
+			assert_eq!(rest, "");
+			value
+		}
+		Err(_) => panic!("parse content failed"),
+	}
+}
 #[cfg(test)]
 mod tests {
 	use super::*;
@@ -235,9 +245,9 @@ mod tests {
 				);
 				assert_eq!(
 					json.get("tags"),
-					Some(&ParsedValue::List(vec![
-						ParsedValue::String("Utilities".to_string())]
-					))
+					Some(&ParsedValue::List(vec![ParsedValue::String(
+						"Utilities".to_string()
+					)]))
 				);
 				assert_eq!(
 					json.get("supported_version"),
