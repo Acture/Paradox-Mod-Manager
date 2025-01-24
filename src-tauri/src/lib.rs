@@ -1,5 +1,8 @@
 mod config;
-mod file;
+mod game_file;
+mod game_mod;
+mod parse;
+
 use dashmap::DashMap;
 use log::{debug, error, info};
 use serde_json;

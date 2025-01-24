@@ -32,6 +32,24 @@ impl FileStruct {
 	}
 }
 
+pub fn get_files(base_dir: PathBuf) -> Vec<FileStruct> {
+	let mut files = Vec::new();
+	for entry in std::fs::read_dir(&base_dir).unwrap() {
+		let entry = entry.unwrap();
+		let path = entry.path();
+		if path.is_dir() {
+			continue;
+		}
+		let name = entry.file_name().to_string_lossy().to_string();
+		let relative_path = path.strip_prefix(&base_dir).unwrap().to_path_buf();
+		let mut file = FileStruct::new(name, base_dir.clone(), relative_path);
+		file.calculate_hash();
+		files.push(file);
+	}
+	files
+}
+
+
 #[cfg(test)]
 mod tests {
 	use super::*;
@@ -46,5 +64,11 @@ mod tests {
 		file.calculate_hash();
 		println!("{:?}", file.hash);
 		assert!(file.hash.is_some());
+	}
+
+	#[test]
+	fn test_get_files() {
+		let files = get_files(PathBuf::from("."));
+		println!("{:?}", files);
 	}
 }
