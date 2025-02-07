@@ -1,9 +1,8 @@
-use crate::game_file::FileStruct;
-use crate::parse::{parse_content, ParsedValue};
+use crate::game::file::FileStruct;
 use dashmap::DashMap;
-use serde::__private::de::Content;
 use std::path::PathBuf;
 use std::sync::{Arc, LazyLock, Mutex};
+use crate::parse::parser::{parse_content, ParsedValue};
 
 static MOD_MAP: LazyLock<DashMap<String, Mod>> = LazyLock::new(|| DashMap::new());
 

@@ -228,7 +228,7 @@ mod tests {
 
 	#[test]
 	fn test_file() {
-		let content = include_str!("../tests/resources/defines.mod");
+		let content = include_str!("../../tests/resources/defines.mod");
 		let result = top_level(content);
 		match result {
 			Ok((rest, json)) => {

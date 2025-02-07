@@ -1,6 +1,5 @@
 mod config;
-mod game_file;
-mod game_mod;
+mod game;
 mod parse;
 
 use dashmap::DashMap;
@@ -11,10 +10,10 @@ use std::sync::LazyLock;
 use tauri::{Manager, RunEvent};
 use tauri_plugin_log::{Target, TargetKind};
 
-static GAME_CONFIG: LazyLock<DashMap<String, config::GameConfig>> =
+static GAME_CONFIG: LazyLock<DashMap<String, config::game::GameConfig>> =
 	LazyLock::new(|| DashMap::new());
 
-static CONFIG: LazyLock<config::Config> = LazyLock::new(|| config::Config::default());
+static CONFIG: LazyLock<config::base::Config> = LazyLock::new(|| config::base::Config::default());
 
 fn load_game_config() {
 	if CONFIG.config_save_path.exists() {
@@ -27,7 +26,7 @@ fn load_game_config() {
 				return;
 			}
 		};
-		let game_configs: Vec<config::GameConfig> = match serde_yaml::from_slice(&content) {
+		let game_configs: Vec<config::game::GameConfig> = match serde_yaml::from_slice(&content) {
 			Ok(gc) => gc,
 			Err(e) => {
 				error!(
@@ -53,7 +52,7 @@ fn load_game_config() {
 }
 
 fn save_game_config() {
-	let game_configs: Vec<config::GameConfig> =
+	let game_configs: Vec<config::game::GameConfig> =
 		GAME_CONFIG.iter().map(|gc| gc.value().clone()).collect();
 	if game_configs.is_empty() {
 		info!("No game configurations to save.");
@@ -91,7 +90,7 @@ async fn setup_game_config(
 		);
 		let game_dir = std::path::PathBuf::from(game_dir);
 		let mod_dir = std::path::PathBuf::from(mod_dir);
-		let game_config = config::GameConfig::new(game_name.clone(), game_dir, mod_dir);
+		let game_config = config::game::GameConfig::new(game_name.clone(), game_dir, mod_dir);
 		game_config.validate()?;
 		GAME_CONFIG.insert(game_name, game_config);
 		Ok(())
