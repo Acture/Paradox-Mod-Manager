@@ -1,9 +1,7 @@
-use std::path::{Path, PathBuf};
 use super::component::Component;
 use super::dependency::Dependency;
-use super::meta::{Meta, MetaBuilder};
+use super::meta::Meta;
 use derive_builder::Builder;
-use crate::lang::parser::{parse_content};
 
 #[derive(Builder, Debug)]
 pub struct Module {

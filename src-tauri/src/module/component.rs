@@ -3,7 +3,7 @@ use derive_builder::Builder;
 use md5::{Digest, Md5};
 use std::error::Error;
 use std::fs::File;
-use std::io::{Read, BufReader};
+use std::io::{BufReader, Read};
 use std::path::{Path, PathBuf};
 
 #[derive(Builder, Debug, Clone)]
@@ -48,7 +48,7 @@ impl Component {
 	}
 
 	pub fn get_components_from_dir<P: AsRef<Path>>(
-		dir: P,
+        dir: P,
 	) -> Result<Vec<Component>, Box<dyn Error>> {
 		let mut components = Vec::new();
 		let files = visit_dir(&dir)?;

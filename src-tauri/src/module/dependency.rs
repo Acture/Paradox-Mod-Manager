@@ -1,6 +1,6 @@
-use std::rc::Rc;
 use super::module::Module;
 use derive_builder::Builder;
+use std::rc::Rc;
 #[derive(Builder, Debug, Clone)]
 pub struct Dependency {
 	name: String,
