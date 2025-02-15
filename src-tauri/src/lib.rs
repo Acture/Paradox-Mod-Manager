@@ -1,14 +1,15 @@
 mod config;
-mod game;
-mod parse;
+mod lang;
+mod module;
+mod utility;
+pub mod manager;
 
 use dashmap::DashMap;
 use log::{debug, error, info};
 use serde_json;
 use serde_yaml;
 use std::sync::LazyLock;
-use tauri::{Manager, RunEvent};
-use tauri_plugin_log::{Target, TargetKind};
+use tauri::RunEvent;
 
 static GAME_CONFIG: LazyLock<DashMap<String, config::game::GameConfig>> =
 	LazyLock::new(|| DashMap::new());
@@ -115,7 +116,7 @@ async fn read_game_config(game_name: &str) -> Result<serde_json::Value, String> 
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-	let mut app = tauri::Builder::default()
+	let app = tauri::Builder::default()
 		.plugin(tauri_plugin_updater::Builder::new().build())
 		.plugin(tauri_plugin_log::Builder::new().build())
 		.plugin(tauri_plugin_shell::init())
@@ -125,7 +126,7 @@ pub fn run() {
 			setup_game_config,
 			read_game_config
 		])
-		.setup(|app| {
+		.setup(|_app| {
 			load_game_config();
 			Ok(())
 		})

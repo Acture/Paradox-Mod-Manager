@@ -1,2 +1,2 @@
-pub mod base;
+pub(crate) mod base;
 pub mod game;

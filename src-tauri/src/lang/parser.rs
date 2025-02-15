@@ -1,8 +1,6 @@
 use nom::branch::alt;
 use nom::bytes::complete::{is_not, tag};
-use nom::character::complete::{
-    alphanumeric1, anychar, char, multispace0, multispace1, newline, space0,
-};
+use nom::character::complete::{alphanumeric1, char, multispace0, multispace1, newline, space0};
 use nom::combinator::map;
 use nom::multi::separated_list0;
 use nom::sequence::{delimited, separated_pair};
@@ -10,10 +8,40 @@ use nom::IResult;
 use std::collections::HashMap;
 
 #[derive(Debug, PartialEq)]
-pub(crate) enum ParsedValue {
+pub enum ParsedValue {
 	String(String),                     // 单独的字符串值
-	JSON(HashMap<String, ParsedValue>), // 嵌套的 JSON 键值对
+	MAP(HashMap<String, ParsedValue>), // 嵌套的 JSON 键值对
 	List(Vec<ParsedValue>),             // 列表
+}
+
+impl ParsedValue {
+	pub fn as_string(&self) -> Option<String> {
+		match self {
+			ParsedValue::String(s) => Some(s.to_string()),
+			_ => None,
+		}
+	}
+
+	pub fn as_array(&self) -> Option<&Vec<ParsedValue>> {
+		match self {
+			ParsedValue::List(arr) => Some(arr),
+			_ => None,
+		}
+	}
+
+	pub fn as_str(&self) -> Option<&str> {
+		match self {
+			ParsedValue::String(s) => Some(s),
+			_ => None,
+		}
+	}
+
+	pub fn as_map(&self) -> Option<&HashMap<String, ParsedValue>> {
+		match self {
+			ParsedValue::MAP(map) => Some(map),
+			_ => None,
+		}
+	}
 }
 
 fn key(input: &str) -> IResult<&str, String> {
@@ -32,7 +60,7 @@ fn value(input: &str) -> IResult<&str, ParsedValue> {
 			ParsedValue::String(res.to_string())
 		}),
 		map(list, |res| ParsedValue::List(res)),
-		map(json, |res| ParsedValue::JSON(res)),
+		map(json, |res| ParsedValue::MAP(res)),
 	))(input)
 }
 
@@ -79,16 +107,13 @@ fn top_level(input: &str) -> IResult<&str, HashMap<String, ParsedValue>> {
 	)(input)
 }
 
-pub fn parse_content(input: &str) -> HashMap<String, ParsedValue> {
-	let result = top_level(input);
-	match result {
-		Ok((rest, value)) => {
-			assert_eq!(rest, "");
-			value
-		}
-		Err(_) => panic!("parse content failed"),
+pub fn parse_content(content: &str) -> Result<HashMap<String, ParsedValue>, String> {
+	match top_level(content) {
+		Ok((_, json)) => Ok(json),
+		Err(e) => Err(format!("Failed to parse content: {:?}", e)),
 	}
 }
+
 #[cfg(test)]
 mod tests {
 	use super::*;
@@ -234,7 +259,7 @@ mod tests {
 			Ok((rest, json)) => {
 				println!("rest: {}, json: {:?}", rest, json);
 				assert_eq!(rest, "");
-				assert_eq!(json.len(), 5);
+				assert_eq!(json.len(), 6);
 				assert_eq!(
 					json.get("version"),
 					Some(&ParsedValue::String("0.0.1".to_string()))
